@@ -1,8 +1,9 @@
 {
   "name": "order-system",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js", // <-- 이 부분을 "server.js"로 변경
   "scripts": {
+    "start": "node server.js", // <-- 이 라인을 추가
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
