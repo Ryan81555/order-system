@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 8080; // <-- 이 부분을 이렇게 변경!
+const PORT = process.env.PORT || 8080;
 
 // 정적 파일(HTML, CSS, JS) 제공
 app.use(express.static('public'));
