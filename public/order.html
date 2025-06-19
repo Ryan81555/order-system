@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>테이블 주문</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-bg: linear-gradient(135deg, #f8fffe 0%, #e0e7ff 100%);
+      --glass-bg: rgba(255,255,255,0.85);
+      --glass-blur: blur(8px);
+      --primary: #4f8cff;
+      --success: #43e97b;
+      --danger: #ff4e50;
+      --text-main: #232526;
+      --text-sub: #7b8fa6;
+      --card-shadow: 0 8px 32px 0 rgba(79,140,255,0.10);
+      --border-glass: 1.5px solid rgba(79,140,255,0.13);
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--main-bg);
+      min-height: 100vh;
+    }
+    body {
+      font-family: 'Montserrat', 'Noto Sans KR', Arial, sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      background: var(--main-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .container {
+      width: 100%;
+      max-width: 420px;
+      margin: 48px auto 0 auto;
+      background: var(--glass-bg);
+      border-radius: 32px;
+      box-shadow: var(--card-shadow);
+      border: var(--border-glass);
+      backdrop-filter: var(--glass-blur);
+      padding: 40px 28px 32px 28px;
+      position: relative;
+      z-index: 1;
+      animation: fadeIn 1s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+      color: #4f8cff;
+      text-shadow: 0 2px 16px rgba(79,140,255,0.08);
+    }
+    .table-num {
+      text-align: center;
+      margin-bottom: 18px;
+      font-size: 1.1em;
+      color: var(--text-sub);
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: rgba(79,140,255,0.07);
+      border-radius: 12px;
+      padding: 10px 0 8px 0;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.06);
+    }
+    .menu-list {
+      margin-bottom: 24px;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(79,140,255,0.08);
+      border: 1.5px solid #e0e7ff;
+      animation: fadeIn 0.7s cubic-bezier(.4,0,.2,1);
+      transition: box-shadow 0.2s;
+    }
+    .menu-item:hover {
+      box-shadow: 0 4px 24px rgba(67,233,123,0.13);
+      border: 1.5px solid #4f8cff;
+    }
+    .menu-name {
+      font-size: 1.12em;
+      font-weight: 700;
+      color: #4f8cff;
+      margin-right: 8px;
+      letter-spacing: 1px;
+    }
+    .menu-price {
+      color: #43e97b;
+      font-weight: 700;
+      margin-right: 12px;
+      font-size: 1.08em;
+    }
+    .menu-qty {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .menu-qty input[type="number"] {
+      width: 48px;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1.5px solid #b0b8c1;
+      font-size: 1em;
+      text-align: center;
+      background: #f8fffe;
+      color: #232526;
+      font-weight: bold;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .menu-qty input[type="number"]:focus {
+      border: 1.5px solid #4f8cff;
+    }
+    #orderBtn {
+      width: 100%;
+      background: linear-gradient(90deg, #4f8cff 0%, #43e97b 100%);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 18px 0;
+      font-size: 1.15em;
+      font-weight: bold;
+      margin-top: 18px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px rgba(79,140,255,0.10);
+      letter-spacing: 1px;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    #orderBtn:hover {
+      background: linear-gradient(90deg, #43e97b 0%, #4f8cff 100%);
+      box-shadow: 0 4px 16px rgba(67,233,123,0.18);
+    }
+    #result {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 1.1em;
+      color: #4f8cff;
+      font-weight: bold;
+      min-height: 24px;
+    }
+    @media (max-width: 600px) {
+      html, body {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: var(--main-bg) !important;
+      }
+      .container {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+      }
+      .menu-item {
+        border-radius: 0 !important;
+        margin-bottom: 10px;
+      }
+      #orderBtn { padding: 14px 0; font-size: 1em; }
+    }
+    @media (max-width: 400px) {
+      .container { padding: 0; }
+      .menu-item { padding: 8px 0; border-radius: 0; }
+    }
+    .account-info {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 1.08em;
+      color: #4f8cff;
+      background: #e0e7ff;
+      border-radius: 12px;
+      padding: 10px 0 8px 0;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.06);
+    }
+    .input-guide {
+      text-align: center;
+      font-size: 1.08em;
+      color: #4f8cff;
+      background: #e0e7ff;
+      border-radius: 12px;
+      padding: 12px 0 10px 0;
+      font-weight: bold;
+      letter-spacing: 0px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.06);
+    }
+    .input-guide-detail {
+      color: #43b97f;
+      font-size: 0.98em;
+      font-weight: 400;
+      display: block;
+      margin-top: 2px;
+    } 
+    .pocha-only {
+      display: inline-block;
+      background: #ff4e50;
+      color: #fff;
+      font-size: 0.85em;
+      font-weight: bold;
+      border-radius: 7px;
+      padding: 2px 7px;
+      margin-left: 7px;
+      vertical-align: middle;
+      letter-spacing: 0.5px;
+      box-shadow: 0 1px 4px #ff4e5022;
+    }
+    .menu-section-title {
+      font-size: 1.15em;
+      font-weight: bold;
+      color: #fd0000;
+      margin: 18px 0 10px 0;
+      letter-spacing: 1px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>가평 월드빌리지<br>메뉴 주문</h1>
+    <div class="input-guide">
+      테이블 번호 또는 객실 동호수를 적어주세요.<br>
+      <span class="input-guide-detail">낭만포차에 계시다면 <b>테이블 번호</b>를,<br> 월드빌리지 객실에서 편한함을 만끽 중 이시라면<br> <b>동/호수</b>를 적어주세요.</span>
+      <div class="table-num-row">
+        <label>테이블 번호: <input type="number" id="tableNum" min="1" max="20" required style="width:60px; padding:6px; border-radius:8px; border:1.5px solid #b0b8c1; font-size:1em; text-align:center; background:#f8fffe; color:#232526; font-weight:bold;"></label>
+        <label style="margin-left:18px;">객실 동호수: <input type="text" id="roomNum" maxlength="20" placeholder="예: C동 101호" style="width:110px; padding:6px; border-radius:8px; border:1.5px solid #b0b8c1; font-size:1em; text-align:center; background:#f8fffe; color:#232526; font-weight:bold;"></label>
+        <label style="display:block; margin-top:10px;">
+          전화번호: <input type="tel" id="phoneNum" maxlength="20" placeholder="예: 010-1234-5678" style="width:130px; padding:6px; border-radius:8px; border:1.5px solid #b0b8c1; font-size:1em; text-align:center; background:#f8fffe; color:#232526; font-weight:bold;">
+        </label>
+    <div class="menu-list" id="pochaMenuList"></div>
+    <div class="menu-list" id="commonMenuList"></div>
+    <div id="orderPreview" style="margin:18px 0; padding:14px; background:#f8fffe; border-radius:12px; box-shadow:0 2px 8px #4f8cff22; color:#232526; font-size:1.05em;">
+      <b>주문 미리보기</b><br>
+      <div id="previewItems" style="margin-top:8px;"></div>
+      <div id="previewTotal" style="margin-top:8px; font-weight:bold; color:#4f8cff;"></div>
+    </div>
+    <button id="orderBtn">주문하기</button>
+    <div id="result"></div>
+    <div class="account-info">
+      <div style="color:#ff4e50; font-weight:bold; margin-bottom:6px;">
+        결제 방식은 계좌이체만 지원합니다. 감사합니다.
+      </div>
+      <strong>입금계좌:</strong> 산림조합중앙회 164-11-0000788 <br>(예금주: 이동훈)
+    </div>
+    <button id="adminLoginBtn" style="margin-top:24px; width:100%;">관리자 로그인</button>
+  </div>
+  <div class="cafe-promo" style="
+  background: #fff7ed;
+  border: 1.5px solid #fdba74;
+  border-radius: 14px;
+  padding: 22px 14px;
+  margin: 32px 0 18px 0;
+  color: #b45309;
+  font-size: 1.08em;
+  box-shadow: 0 4px 16px #fdba741a;
+  text-align: center; /* 가운데 정렬 추가 */
+">
+  <div style="font-size:1.25em; font-weight:700; color:#ea580c; margin-bottom:10px;">
+    🎉 월드빌리지 고객 전용 <br>가평 카페 특별 할인!
+  </div>
+  <div style="margin-bottom:10px;">
+    저희 월드빌리지에 오신 분들께만 드리는 혜택!<br>
+    <b>가평 "카페 레이크애비뉴"</b>에서 <span style="color:#ea580c;font-weight:600;"><br>음료 전품목 10% 할인</span>을 받으실 수 있습니다.<br>
+    <span style="color:#b91c1c;">(※ 베이커리류는 할인 제외)</span>
+  </div>
+  <div style="margin-bottom:10px;">
+    <b>할인 방법:</b> 체크인 시 받으신 안내 문자 내역을 <br>카페 직원에게 보여주세요!
+  </div>
+  <div style="margin-bottom:10px;">
+    <b>카페 위치:</b> 가평군 호반로 1526 <br>(월드빌리지에서 차량 10분) 설악 IC 방향
+  </div>
+<!-- 갤러리 전체를 감싸는 div -->
+<div class="cafe-gallery" style="display: flex; flex-direction: column; gap: 8px; align-items: center; margin-top: 10px;">
+  <!-- 1층 (윗줄) -->
+  <div style="display: flex; gap: 10px;">
+    <img src="images/101.jpg" alt="카페 전경1" style="width: 300px; height: 200px; border-radius: 8px; border: 1px solid #fdba74; cursor: pointer;" onclick="openImageModal(this.src)">
+    <img src="images/102.jpg" alt="카페 전경2" style="width: 300px; height: 200px; border-radius: 8px; border: 1px solid #fdba74; cursor: pointer;" onclick="openImageModal(this.src)">
+  </div>
+  <!-- 2층 (아랫줄) -->
+  <div style="display: flex; gap: 10px;">
+    <img src="images/104.jpg" alt="카페 전경3" style="width: 300px; height: 200px; border-radius: 8px; border: 1px solid #fdba74; cursor: pointer;" onclick="openImageModal(this.src)">
+    <img src="images/105.jpg" alt="카페 전경4" style="width: 300px; height: 200px; border-radius: 8px; border: 1px solid #fdba74; cursor: pointer;" onclick="openImageModal(this.src)">
+  </div>
+</div>
+  <script>
+    let menuData = [];
+    // URL에서 table 파라미터 읽기
+    function getTableFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('table');
+    }
+    // 페이지 로드 시 테이블 번호 자동 입력
+    window.onload = function() {
+      const tableNum = getTableFromUrl();
+      if (tableNum) {
+        document.getElementById('tableNum').value = tableNum;
+        document.getElementById('tableNum').readOnly = true;
+      }
+    };
+    // 메뉴 불러오기
+    function updateOrderPreview() {
+      const items = menuData
+        .map(menu => ({
+          name: menu.name,
+          price: menu.price,
+          qty: Number(document.getElementById('menu_' + menu.id).value)
+        }))
+        .filter(item => item.qty > 0);
+    
+      const previewItemsDiv = document.getElementById('previewItems');
+      const previewTotalDiv = document.getElementById('previewTotal');
+    
+      if (items.length === 0) {
+        previewItemsDiv.innerHTML = '선택한 메뉴가 없습니다.';
+        previewTotalDiv.innerHTML = '';
+        return;
+      }
+    
+      previewItemsDiv.innerHTML = items.map(item =>
+        `${item.name} × ${item.qty} = ${(item.price * item.qty).toLocaleString()}원`
+      ).join('<br>');
+    
+      const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+      previewTotalDiv.innerHTML = `총 금액: <span style="color:#43e97b">${total.toLocaleString()}원</span>`;
+    }
+    
+    function addQtyListeners() {
+      menuData.forEach(menu => {
+        document.getElementById('menu_' + menu.id).addEventListener('input', updateOrderPreview);
+      });
+    }
+    
+    fetch('/api/menu')
+      .then(res => res.json())
+      .then(data => {
+        menuData = data;
+        const pochaMenuListDiv = document.getElementById('pochaMenuList');
+        const commonMenuListDiv = document.getElementById('commonMenuList');
+        const onlyPochaMenus = ['하이네켄 생맥주', '테라 생맥주', '아메리카노', '얼음 바틀'];
+        const pochaMenus = data.filter(menu => onlyPochaMenus.some(name => menu.name.includes(name)));
+        const commonMenus = data.filter(menu => !onlyPochaMenus.some(name => menu.name.includes(name)));
+        pochaMenuListDiv.innerHTML = '<h2 class="menu-section-title">낭만포차 전용 메뉴</h2>' +
+          pochaMenus.map(menu =>
+            `<div class="menu-item">
+              <span class="menu-name">${menu.name}</span>
+              <span class="menu-price">${menu.price.toLocaleString()}원</span>
+              <span class="menu-qty">
+                <input type="number" min="0" value="0" id="menu_${menu.id}">
+              </span>
+            </div>`
+          ).join('');
+        commonMenuListDiv.innerHTML = '<h2 class="menu-section-title">낭만포차/객실 공용 메뉴</h2>' +
+          commonMenus.map(menu =>
+            `<div class="menu-item">
+              <span class="menu-name">${menu.name}</span>
+              <span class="menu-price">${menu.price.toLocaleString()}원</span>
+              <span class="menu-qty">
+                <input type="number" min="0" value="0" id="menu_${menu.id}">
+              </span>
+            </div>`
+          ).join('');
+        addQtyListeners();
+        updateOrderPreview();
+      });
+
+      document.getElementById('orderBtn').onclick = () => {
+        const table = document.getElementById('tableNum').value.trim();
+        const room = document.getElementById('roomNum').value.trim();
+        const phone = document.getElementById('phoneNum').value.trim();
+        const items = menuData
+          .map(menu => ({
+            id: menu.id,
+            name: menu.name,
+            price: menu.price,
+            qty: Number(document.getElementById('menu_' + menu.id).value)
+          }))
+          .filter(item => item.qty > 0);
+      
+        if ((!table && !room) || items.length === 0) {
+          document.getElementById('result').innerText = '테이블 번호 또는 동/호수 중 하나와 메뉴를 입력하세요!';
+          return;
+        }
+        if (!phone) {
+          document.getElementById('result').innerText = '전화번호를 입력하세요!';
+          return;
+        }
+      
+        // === 여기 추가 ===
+        const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+      
+        fetch('/api/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ table, room, phone, items, total }) // total 추가!
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('result').innerHTML =
+              '주문이 접수되었습니다!<br>' +
+              '<span style="color:#ff4e50;font-weight:bold;">결제 방식은 계좌이체만 지원합니다.</span><br>' +
+              '<span style="color:#43e97b;font-weight:bold;">입금계좌: 산림조합중앙회 164-11-0000788 (예금주: 이동훈)</span>';
+            // 입력값 초기화
+            menuData.forEach(menu => {
+              document.getElementById('menu_' + menu.id).value = 0;
+            });
+            document.getElementById('phoneNum').value = '';
+          }
+        });
+      };
+
+      document.getElementById('adminLoginBtn').onclick = function() {
+        const pw = prompt('관리자 비밀번호를 입력하세요:');
+        if (pw === '1579') { // 원하는 비밀번호로 변경
+          window.location.href = '/admin';
+        } else if (pw !== null) {
+          alert('비밀번호가 틀렸습니다.');
+        }
+      };
+
+      function openImageModal(src) {
+        document.getElementById('imgModalContent').src = src;
+        document.getElementById('imgModal').style.display = 'flex';
+      }
+      function closeImageModal() {
+        document.getElementById('imgModal').style.display = 'none';
+      }
+        </script>
+        <div id="imgModal" style="display:none; position:fixed; z-index:99999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
+          <span onclick="closeImageModal()" style="position:absolute; top:24px; right:36px; color:#fff; font-size:2.5em; font-weight:700; cursor:pointer; z-index:100001;">&times;</span>
+          <img id="imgModalContent" src="" style="max-width:90vw; max-height:80vh; border-radius:14px; box-shadow:0 8px 32px #0008;">
+        </div>
+</body>
+</html>

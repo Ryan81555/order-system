@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 주문 목록</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-bg: linear-gradient(135deg, #f8fffe 0%, #e0e7ff 100%);
+      --glass-bg: rgba(255,255,255,0.85);
+      --glass-blur: blur(8px);
+      --primary: #4f8cff;
+      --success: #43e97b;
+      --warning: #ffb347;
+      --danger: #ff4e50;
+      --text-main: #232526;
+      --text-sub: #7b8fa6;
+      --card-shadow: 0 8px 32px 0 rgba(79,140,255,0.10);
+      --border-glass: 1.5px solid rgba(79,140,255,0.13);
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--main-bg);
+      min-height: 100vh;
+    }
+    body {
+      font-family: 'Montserrat', 'Noto Sans KR', Arial, sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      background: var(--main-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .container {
+      width: 100%;
+      max-width: 540px;
+      margin: 48px auto 0 auto;
+      background: var(--glass-bg);
+      border-radius: 32px;
+      box-shadow: var(--card-shadow);
+      border: var(--border-glass);
+      backdrop-filter: var(--glass-blur);
+      padding: 40px 28px 32px 28px;
+      position: relative;
+      z-index: 1;
+      /* animation: fadeIn 1s cubic-bezier(.4,0,.2,1); */
+    }
+    .fixed-header {
+      position: sticky;
+      top: 0;
+      background: var(--glass-bg);
+      z-index: 10;
+      border-radius: 32px 32px 0 0;
+      box-shadow: 0 2px 12px rgba(79,140,255,0.08);
+      padding-top: 24px;
+      margin-bottom: 0;
+    }
+    .fixed-tabs {
+      position: sticky;
+      top: 64px;
+      background: var(--glass-bg);
+      z-index: 10;
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 2px 12px rgba(79,140,255,0.04);
+      margin-bottom: 0;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.2em;
+      font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+      color: #4f8cff;
+      text-shadow: 0 2px 16px rgba(79,140,255,0.08);
+    }
+    .stats {
+      text-align: center;
+      font-size: 1.1em;
+      margin-bottom: 28px;
+      color: var(--text-sub);
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: rgba(79,140,255,0.07);
+      border-radius: 12px;
+      padding: 12px 0 10px 0;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.06);
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+      gap: 12px;
+    }
+    .tab {
+      padding: 12px 36px;
+      border-radius: 16px 16px 0 0;
+      background: #f0f4fa;
+      color: #4f8cff;
+      font-weight: 700;
+      font-size: 1.1em;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.04);
+      letter-spacing: 1px;
+    }
+    .tab.active {
+      background: linear-gradient(90deg, #4f8cff 0%, #43e97b 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(79,140,255,0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    .order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      min-height: 120px;
+    }
+    .order-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 18px;
+      box-shadow: 0 4px 24px 0 rgba(79,140,255,0.10);
+      border: 2.5px solid #e0e7ff;
+      backdrop-filter: blur(4px);
+      padding: 28px 32px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      position: relative;
+      transition: box-shadow 0.2s, border 0.2s;
+      font-size: 1.13em;
+      min-width: 0;
+      word-break: keep-all;
+    }
+    .order-card.waiting {
+      border-color: #4f8cff;
+      background: #f0f6ff;
+    }
+    .order-card.ready {
+      border-color: #43e97b;
+      background: #f6fff8;
+    }
+    .order-card.done {
+      border-color: #ffb347;
+      background: #fffaf0;
+    }
+    .order-card:hover {
+      box-shadow: 0 8px 32px rgba(67,233,123,0.13);
+      border: 1.5px solid #4f8cff;
+    }
+    .order-id {
+      font-weight: 700;
+      color: #4f8cff;
+      margin-bottom: 8px;
+      font-size: 1.18em;
+      letter-spacing: 1px;
+    }
+    .order-table {
+      color: #43e97b;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .order-phone {
+      margin-bottom: 6px;
+      color: #7b8fa6;
+      font-size: 1em;
+    }
+    .order-total {
+      margin-bottom: 6px;
+      color: #7b8fa6;
+      font-size: 1em;
+    }
+    .order-menu {
+      margin-bottom: 10px;
+      color: #232526;
+      font-size: 1.08em;
+    }
+    .order-time {
+      font-size: 1em;
+      color: #7b8fa6;
+      margin-bottom: 14px;
+    }
+    .order-card button {
+      padding: 9px 22px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.13em;
+      font-weight: 700;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-bottom: 4px;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.10);
+      letter-spacing: 1px;
+    }
+    .btn-ready { background: linear-gradient(90deg, #4f8cff 0%, #43e97b 100%); color: #fff; }
+    .btn-serve { background: linear-gradient(90deg, #ffb347 0%, #ff4e50 100%); color: #fff; }
+    .btn-done { background: #b0b8c1; color: #fff; cursor: default; }
+    .btn-cancel { background: linear-gradient(90deg, #ff4e50 0%, #ffb347 100%); color: #fff; }
+    .order-card button:active { filter: brightness(0.95);}
+    .order-card button:disabled { opacity: 0.7; }
+    @media (max-width: 700px) {
+      html, body {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: var(--main-bg) !important;
+      }
+      .container {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+      }
+      .fixed-header { top: 0; border-radius: 0; padding-top: 10px; }
+      .fixed-tabs { top: 48px; border-radius: 0; }
+      .order-list { gap: 16px; }
+      .order-card {
+        padding: 12px 4px 10px 4px;
+        font-size: 1em;
+        border-radius: 0 !important;
+      }
+      .order-id { font-size: 1.08em; }
+      .order-table, .order-phone, .order-total, .order-menu, .order-time { font-size: 0.97em; }
+      .order-card button { font-size: 1em; padding: 10px 0; width: 100%; margin: 6px 0 0 0; }
+      .tab { font-size: 1em; padding: 8px 10px; }
+    }
+    @media (max-width: 480px) {
+      .order-card { padding: 8px 0 8px 0; font-size: 0.97em; border-radius: 0 !important; }
+      .order-list { gap: 10px; }
+    }
+    .order-alert {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #4f8cff 0%, #43e97b 100%);
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.15em;
+      padding: 16px 32px;
+      border-radius: 24px;
+      box-shadow: 0 4px 24px rgba(79,140,255,0.18);
+      z-index: 9999;
+      animation: fadeInDown 0.5s;
+      opacity: 1;
+      transition: opacity 0.5s;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translate(-50%, -30px);}
+      to { opacity: 1; transform: translate(-50%, 0);}
+    }
+    .summary-stats {
+      margin-bottom: 18px;
+      padding: 16px 18px;
+      background: #f8fffe;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px #4f8cff22;
+      color: #232526;
+      font-size: 1.08em;
+      font-weight: 500;
+      line-height: 1.7;
+    }
+    .summary-stats b {
+      color: #4f8cff;
+    }
+    @media (max-width: 700px) {
+      html, body {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #10131a !important; /* 또는 var(--main-bg) */
+        width: 100vw !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+      }
+      .container, .fixed-header, .fixed-tabs {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        min-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+      }
+      .order-list {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .order-card {
+        border-radius: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100vw !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #fff !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="orderAlert" class="order-alert" style="display:none;"></div>
+  <div id="summaryStats" class="summary-stats"></div>
+  <div class="container">
+    <div class="fixed-header">
+      <h1>주문 관리</h1>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="fixed-tabs tabs">
+      <button class="tab active" id="tab-wait" onclick="showTab('대기')">대기</button>
+      <button class="tab" id="tab-ready" onclick="showTab('준비중')">준비중</button>
+      <button class="tab" id="tab-done" onclick="showTab('서빙완료')">서빙완료</button>
+    </div>
+    <div class="order-list" id="orderList"></div>
+  </div>
+
+  <audio id="notifySound" src="notify.mp3" preload="auto"></audio>
+
+  <script>
+    let lastOrderCount = 0;
+    let firstInteraction = false;
+    let allOrders = [];
+    let currentTab = '대기';
+    let alarmInterval = null;
+
+    window.addEventListener('click', () => { firstInteraction = true; });
+
+    function playAlarm() {
+      const audio = document.getElementById('notifySound');
+      audio.currentTime = 0;
+      audio.play().catch(e => {});
+      if (window.navigator.vibrate) {
+        window.navigator.vibrate(300);
+      }
+    }
+
+    function checkWaitingOrders() {
+      // "대기" 상태 주문이 하나라도 있으면 알람 반복
+      const hasWaiting = allOrders.some(order => order.status === '대기');
+      if (hasWaiting) {
+        if (!alarmInterval) {
+          playAlarm();
+          alarmInterval = setInterval(playAlarm, 3000); // 3초마다 알림
+        }
+      } else {
+        if (alarmInterval) {
+          clearInterval(alarmInterval);
+          alarmInterval = null;
+        }
+      }
+    }
+
+    function renderStats(orders) {
+      let total = 0;
+      let count = 0;
+      let menuStats = {};
+      orders.forEach(order => {
+        if(order.status === '서빙완료') {
+          order.items.forEach(item => {
+            total += item.price * item.qty;
+            menuStats[item.name] = (menuStats[item.name] || 0) + item.qty;
+          });
+          count++;
+        }
+      });
+      let menuStr = Object.entries(menuStats).map(([name, qty]) => `${name}: ${qty}개`).join(', ');
+      document.getElementById('stats').innerText = `오늘 매출: ${total.toLocaleString()}원 | 총 주문: ${orders.length}건 | ${menuStr}`;
+    }
+
+    function renderSummaryStats(orders) {
+      // 오늘 날짜
+      const today = new Date();
+      const todayStr = today.toLocaleDateString();
+
+      // 이번주(일~토)
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+
+      // 이번달
+      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+      const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+      // 집계용 변수
+      let todaySales = 0, todayCount = 0, todayCancel = 0;
+      let weekSales = 0, weekCount = 0, weekCancel = 0;
+      let monthSales = 0, monthCount = 0, monthCancel = 0;
+      const menuStats = {};
+
+      orders.forEach(order => {
+        const d = new Date(order.time);
+        const dateStr = d.toLocaleDateString();
+        const total = order.total || order.items.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+        // 오늘
+        if (dateStr === todayStr) {
+          if (order.status === '서빙완료') {
+            todaySales += total;
+            todayCount++;
+          }
+          if (order.status === '취소') todayCancel++;
+        }
+        // 이번주
+        if (d >= weekStart && d <= weekEnd) {
+          if (order.status === '서빙완료') {
+            weekSales += total;
+            weekCount++;
+          }
+          if (order.status === '취소') weekCancel++;
+        }
+        // 이번달
+        if (d >= monthStart && d <= monthEnd) {
+          if (order.status === '서빙완료') {
+            monthSales += total;
+            monthCount++;
+          }
+          if (order.status === '취소') monthCancel++;
+        }
+        // 인기 메뉴
+        if (order.status === '서빙완료') {
+          order.items.forEach(item => {
+            menuStats[item.name] = (menuStats[item.name] || 0) + item.qty;
+          });
+        }
+      });
+
+      // 인기 메뉴 TOP3
+      const topMenus = Object.entries(menuStats)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([name, qty]) => `${name}(${qty})`)
+        .join(', ') || '없음';
+
+      // 표시
+      document.getElementById('summaryStats').innerHTML = `
+        <b>오늘 매출:</b> ${todaySales.toLocaleString()}원 &nbsp; 
+        <b>오늘 주문수:</b> ${todayCount}건 &nbsp; 
+        <b>오늘 취소:</b> ${todayCancel}건<br>
+        <b>인기메뉴 TOP3:</b> ${topMenus}<br>
+        <b>이번주 매출:</b> ${weekSales.toLocaleString()}원 &nbsp; 
+        <b>주문수:</b> ${weekCount}건 &nbsp; 
+        <b>취소:</b> ${weekCancel}건<br>
+        <b>이번달 매출:</b> ${monthSales.toLocaleString()}원 &nbsp; 
+        <b>주문수:</b> ${monthCount}건 &nbsp; 
+        <b>취소:</b> ${monthCancel}건
+      `;
+    }
+
+    function renderOrders() {
+      const orderList = document.getElementById('orderList');
+      orderList.innerHTML = '';
+      const filtered = allOrders.filter(order => order.status === currentTab);
+      if(filtered.length === 0) {
+        orderList.innerHTML = '<div style="text-align:center;color:#b0b8c1;">주문이 없습니다.</div>';
+        return;
+      }
+      filtered.forEach(order => {
+        const card = document.createElement('div');
+        let cardClass = 'order-card';
+        if(order.status === '대기') cardClass += ' waiting';
+        else if(order.status === '준비중') cardClass += ' ready';
+        else if(order.status === '서빙완료') cardClass += ' done';
+        card.className = cardClass;
+        card.innerHTML = `
+          <div class="order-id">주문번호: ${order.id}</div>
+          <div class="order-table">테이블: ${order.table}</div>
+          <div class="order-phone">전화번호: ${{
+            true: `<a href=\"tel:${order.phone ? order.phone.replace(/[^0-9]/g, '') : ''}\" style=\"color:#007aff;text-decoration:underline;font-weight:bold;\">${order.phone}</a>`,
+            false: '-'
+          }[!!order.phone]}</div>
+          <div class="order-total">${(order.total || order.items.reduce((sum, item) => sum + item.price * item.qty, 0)).toLocaleString()}원</div>
+          <div class="order-menu">${order.items.map(item => `${item.name}(${item.qty})`).join(', ')}</div>
+          <div class="order-time">${new Date(order.time).toLocaleTimeString()}</div>
+        `;
+        if(order.status === '대기') {
+          const btn = document.createElement('button');
+          btn.className = 'btn-ready';
+          btn.innerText = '준비중';
+          btn.onclick = () => changeStatus(order.id, '준비중');
+          card.appendChild(btn);
+        } else if(order.status === '준비중') {
+          const btn = document.createElement('button');
+          btn.className = 'btn-serve';
+          btn.innerText = '서빙완료';
+          btn.onclick = () => changeStatus(order.id, '서빙완료');
+          card.appendChild(btn);
+        } else if(order.status === '서빙완료') {
+          const done = document.createElement('button');
+          done.className = 'btn-done';
+          done.innerText = '완료';
+          done.disabled = true;
+          card.appendChild(done);
+        }
+        // 취소 버튼 (모든 상태에서)
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'btn-cancel';
+        cancelBtn.innerText = '취소';
+        cancelBtn.onclick = () => cancelOrder(order.id);
+        card.appendChild(cancelBtn);
+        orderList.appendChild(card);
+      });
+    }
+
+    function showTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-wait').classList.remove('active');
+      document.getElementById('tab-ready').classList.remove('active');
+      document.getElementById('tab-done').classList.remove('active');
+      if(tab === '대기') document.getElementById('tab-wait').classList.add('active');
+      if(tab === '준비중') document.getElementById('tab-ready').classList.add('active');
+      if(tab === '서빙완료') document.getElementById('tab-done').classList.add('active');
+      renderOrders();
+    }
+
+    function showOrderAlert(msg) {
+      const alertDiv = document.getElementById('orderAlert');
+      alertDiv.innerText = msg;
+      alertDiv.style.display = 'block';
+      alertDiv.style.opacity = '1';
+      setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 500);
+      }, 3000);
+    }
+
+    function fetchOrders() {
+      fetch('/api/orders')
+        .then(res => res.json())
+        .then(data => {
+          allOrders = data;
+          renderStats(data);
+          renderSummaryStats(data);
+          renderOrders();
+          checkWaitingOrders(); // 알림 체크
+          if (data.length > lastOrderCount && firstInteraction) {
+            showOrderAlert('새 주문이 들어왔습니다!');
+          }
+          lastOrderCount = data.length;
+        });
+    }
+
+    function changeStatus(orderId, status) {
+      fetch(`/api/order/${orderId}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      }).then(() => fetchOrders());
+    }
+
+    function cancelOrder(orderId) {
+      if (!confirm('정말로 이 주문을 취소하시겠습니까?')) return;
+      fetch(`/api/order/${orderId}`, {
+        method: 'DELETE'
+      }).then(() => fetchOrders());
+    }
+
+    setInterval(fetchOrders, 3000);
+    fetchOrders();
+  </script>
+</body>
+</html>
