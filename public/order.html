@@ -357,7 +357,7 @@
               <span class="menu-name">${menu.name}</span>
               <span class="menu-price">${menu.price.toLocaleString()}원</span>
               <span class="menu-qty">
-                <input type="number" min="0" value="0" id="menu_${menu.id}">
+                <input type="number" min="0" max="20" value="0" id="menu_${menu.id}">
               </span>
             </div>`
           ).join('');
@@ -367,7 +367,7 @@
               <span class="menu-name">${menu.name}</span>
               <span class="menu-price">${menu.price.toLocaleString()}원</span>
               <span class="menu-qty">
-                <input type="number" min="0" value="0" id="menu_${menu.id}">
+                <input type="number" min="0" max="20" value="0" id="menu_${menu.id}">
               </span>
             </div>`
           ).join('');
@@ -397,13 +397,23 @@
           return;
         }
       
-        // === 여기 추가 ===
+        const excessiveQtyItem = items.find(item => item.qty > 20);
+        if (excessiveQtyItem) {
+          document.getElementById('result').innerHTML = '<span style="color: #ff4e50;">한 메뉴당 최대 20개까지만 주문할 수 있습니다.</span>';
+          return;
+        }
+      
         const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+        if (total > 500000) {
+            document.getElementById('result').innerHTML = '<span style="color: #ff4e50;">총 주문 금액이 50만원을 초과할 수 없습니다.<br>대량 주문은 전화로 문의해주세요.</span>';
+            return;
+        }
       
         fetch('/api/order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ table, room, phone, items, total }) // total 추가!
+          body: JSON.stringify({ table, room, phone, items, total })
         })
         .then(res => res.json())
         .then(data => {
@@ -411,7 +421,7 @@
             document.getElementById('result').innerHTML =
               '주문이 접수되었습니다!<br>' +
               '<span style="color:#ff4e50;font-weight:bold;">결제 방식은 계좌이체만 지원합니다.</span><br>' +
-              '<span style="color:#43e97b;font-weight:bold;">입금계좌: 산림조합중앙회 164-11-0000788 (예금주: 이동훈)</span>';
+              '<span style="color:#43e97b;font-weight:bold;">입금계좌: 산림조합중앙회 164-11-0000788 <br>(예금주: 이동훈)</span>';
             // 입력값 초기화
             menuData.forEach(menu => {
               document.getElementById('menu_' + menu.id).value = 0;
