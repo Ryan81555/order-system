@@ -10,19 +10,19 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/order.html');
 });
-
+// 메뉴목록 ture , flase 판단
 const menuList = [
-    { id: 1, name: '팥빙수 小', price: 10000 },
-    { id: 2, name: '팥빙수 大', price: 15000 },
-    { id: 3, name: '물냉면', price: 10000 },
-    { id: 4, name: '매콤닭발', price: 20000 },
-    { id: 5, name: '하이네켄 생맥주 300', price: 5000 },
-    { id: 6, name: '테라 생맥주 500', price: 4000 },
-    { id: 7, name: '고기만두', price: 6000 },
-    { id: 8, name: '김치만두', price: 6000 },
-    { id: 9, name: '반반만두', price: 6000 },
-    { id: 10, name: '아메리카노', price: 3000 },
-    { id: 11, name: '얼음 바틀', price: 3000 }
+    { id: 1, name: '팥빙수 小', price: 10000, "soldOut": false },
+    { id: 2, name: '팥빙수 大', price: 15000, "soldOut": false },
+    { id: 3, name: '물냉면', price: 10000, "soldOut": false },
+    { id: 4, name: '매콤닭발', price: 20000, "soldOut": false },
+    { id: 5, name: '하이네켄 생맥주 300', price: 5000, "soldOut": false },
+    { id: 6, name: '테라 생맥주 500', price: 4000, "soldOut": false },
+    { id: 7, name: '고기만두', price: 6000, "soldOut": false },
+    { id: 8, name: '김치만두', price: 6000, "soldOut": false },
+    { id: 9, name: '반반만두', price: 6000, "soldOut": false },
+    { id: 10, name: '아메리카노', price: 3000, "soldOut": false },
+    { id: 11, name: '얼음 바틀', price: 3000, "soldOut": false }
 ];
 
 // 메뉴 목록 API
