@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>가평 월드빌리지 메뉴 주문시스템</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
     :root {
       --main-bg: linear-gradient(135deg, #f8fffe 0%, #e0e7ff 100%);
       --glass-bg: rgba(255,255,255,0.85);
@@ -18,7 +22,10 @@
       --border-glass: 1.5px solid rgba(79,140,255,0.13);
     }
     html, body {
-      height: 100%;
+      width: 100vw;
+      min-width: 100vw;
+      max-width: 100vw;
+      overflow-x: hidden;
       margin: 0;
       padding: 0;
       background: var(--main-bg);
@@ -36,8 +43,11 @@
     }
     .container {
       width: 100%;
-      max-width: 420px;
+      max-width: 100vw;
+      min-width: 0;
       margin: 48px auto 0 auto;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
       background: var(--glass-bg);
       border-radius: 32px;
       box-shadow: var(--card-shadow);
